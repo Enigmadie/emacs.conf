@@ -54,6 +54,15 @@
     ;; overrides mark-whole-buffer
     (global-set-key "\C-xh" 'help-command)  (setq indent-line-function 'insert-tab)
 
-    ;; mode for ts extension
+    ;; JS
     (add-to-list 'auto-mode-alist '("\\.tsx\\'" . typescript-mode))
+    (setq-default js-indent-level 2)
+    ;; mode for ts extension
     (setq-default typescript-indent-level 2)
+    ;; tern
+    (eval-after-load 'tern
+      '(progn
+        (require 'tern-auto-complete)
+        (tern-ac-setup)))
+    ;; autocomplete mode on
+    (global-auto-complete-mode t)
