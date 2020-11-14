@@ -37,7 +37,6 @@ This function should only modify configuration layer settings."
      clojure
      php
      tern
-     php
      react
 
      ;; ----------------------------------------------------------------
@@ -236,7 +235,7 @@ It should only modify the values of Spacemacs settings."
 
    ;; If non-nil the cursor color matches the state color in GUI Emacs.
    ;; (default t)
-   dotspacemacs-colorize-cursor-according-to-state t
+   dotspacemacs-colorize-cursor-according-to-state nil
 
    ;; Default font or prioritized list of fonts.
    dotspacemacs-default-font '("Source Code Pro"

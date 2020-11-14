@@ -75,12 +75,32 @@
     (add-to-list 'auto-mode-alist '("\\.vue\\'" . vue-mode))
     (setq create-lockfiles nil)
     (setq-default js-indent-level 2)
+
     ;; mode for ts extension
     (setq-default typescript-indent-level 2)
+
     ;; tern
     (eval-after-load 'tern
       '(progn
         (require 'tern-auto-complete)
        (tern-ac-setup)))
+
     ;; autocomplete mode on
     (global-auto-complete-mode t)
+
+    ;; autocomplete path
+    (require 'company)
+    (add-hook 'after-init-hook 'global-company-mode)
+    (setq company-backends '(company-files))
+
+    ;; color-scheme
+    (set-face-background 'hl-line "#1c1a1a")
+    (set-face-foreground 'highlight nil)
+
+    (if (display-graphic-p)
+      (setq initial-frame-alist
+            '((cursor-color . "white")
+              (background-color . "black")))
+      (setq initial-frame-alist '( (tool-bar-lines . 0))))
+
+    (setq default-frame-alist initial-frame-alist)
