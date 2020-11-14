@@ -49,13 +49,31 @@
         (server-start)))))
 
   ;; My personal configurations
-  (global-set-key "\C-h" 'delete-backward-char)
+(require 'nodejs-repl)
+(add-hook 'js-mode-hook
+          (lambda ()
+            (define-key js-mode-map (kbd "C-x C-e") 'nodejs-repl-send-last-expression)
+            (define-key js-mode-map (kbd "C-c C-j") 'nodejs-repl-send-line)
+            (define-key js-mode-map (kbd "C-c C-r") 'nodejs-repl-send-region)
+            (define-key js-mode-map (kbd "C-c C-c") 'nodejs-repl-send-buffer)
+            (define-key js-mode-map (kbd "C-c C-l") 'nodejs-repl-load-file)
+            (define-key js-mode-map (kbd "C-c C-z") 'nodejs-repl-switch-to-repl)))
+
+    (define-key evil-insert-state-map "\C-h" 'delete-backward-char)
+
+(define-key evil-motion-state-map "\C-h" 'evil-window-left)
+(define-key evil-motion-state-map "\C-l" 'evil-window-right)
+(define-key evil-motion-state-map "\C-k" 'evil-window-up)
+(define-key evil-motion-state-map "\C-j" 'evil-window-down)
 
     ;; overrides mark-whole-buffer
     (global-set-key "\C-xh" 'help-command)  (setq indent-line-function 'insert-tab)
 
     ;; JS
     (add-to-list 'auto-mode-alist '("\\.tsx\\'" . typescript-mode))
+    (add-to-list 'auto-mode-alist '("\\.js\\'" . javascript-mode))
+    (add-to-list 'auto-mode-alist '("\\.vue\\'" . vue-mode))
+    (setq create-lockfiles nil)
     (setq-default js-indent-level 2)
     ;; mode for ts extension
     (setq-default typescript-indent-level 2)
@@ -63,6 +81,6 @@
     (eval-after-load 'tern
       '(progn
         (require 'tern-auto-complete)
-        (tern-ac-setup)))
+       (tern-ac-setup)))
     ;; autocomplete mode on
     (global-auto-complete-mode t)
