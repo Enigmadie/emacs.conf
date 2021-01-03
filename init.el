@@ -104,3 +104,5 @@
       (setq initial-frame-alist '( (tool-bar-lines . 0))))
 
     (setq default-frame-alist initial-frame-alist)
+    ;; vue-color-scheme
+    (custom-set-faces '(mmm-default-submode-face ((t (:background nil)))))
