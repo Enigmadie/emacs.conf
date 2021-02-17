@@ -70,14 +70,21 @@
     (global-set-key "\C-xh" 'help-command)  (setq indent-line-function 'insert-tab)
 
     ;; JS
-    (add-to-list 'auto-mode-alist '("\\.tsx\\'" . typescript-mode))
+    (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.jsx\\'" . rjsx-mode))
     (add-to-list 'auto-mode-alist '("\\.js\\'" . javascript-mode))
     (add-to-list 'auto-mode-alist '("\\.vue\\'" . vue-mode))
+    (add-hook 'typescript-mode-hook 'auto-complete-mode)
+    (add-hook 'javascript-mode-hook 'auto-complete-mode)
+    (add-hook 'rjsx-mode-hook 'auto-complete-mode)
+    (add-hook 'web-mode-hook 'auto-complete-mode)
     (setq create-lockfiles nil)
-    (setq-default js-indent-level 2)
 
-    ;; mode for ts extension
+    ;; intent extensions for ts extension
     (setq-default typescript-indent-level 2)
+    (setq-default js-indent-level 2)
+    (add-hook 'web-mode-hook
+      (lambda () (setq standard-indent 2)))
 
     ;; tern
     (eval-after-load 'tern
@@ -106,3 +113,13 @@
     (setq default-frame-alist initial-frame-alist)
     ;; vue-color-scheme
     (custom-set-faces '(mmm-default-submode-face ((t (:background nil)))))
+  ;; encoding russian words
+  (set-language-environment "Russian")
+  (prefer-coding-system 'utf-8-unix)
+  (set-default-coding-systems 'utf-8-unix)
+
+  ;; react
+  (with-eval-after-load 'rjsx-mode
+    (define-key rjsx-mode-map "<" nil)
+    (define-key rjsx-mode-map (kbd "C-d") nil)
+    (define-key rjsx-mode-map ">" nil))
