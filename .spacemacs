@@ -32,7 +32,8 @@ This function should only modify configuration layer settings."
 
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
-   '(yaml
+   '(typescript
+     yaml
      csv
      sql
      python
@@ -42,7 +43,14 @@ This function should only modify configuration layer settings."
      php
      tern
      react
-
+     (typescript :variables
+                 javascript-backend 'tide
+                 typescript-fmt-tool 'prettier
+                 typescript-linter 'eslint)
+     (javascript :variables
+                 javascript-backend 'tide
+                 javascript-fmt-tool 'prettier
+                 node-add-modules-path t)
      ;; ----------------------------------------------------------------
      ;; Example of useful layers you may want to use right away.
      ;; Uncomment some layer names and press `SPC f e R' (Vim style) or
@@ -61,7 +69,7 @@ This function should only modify configuration layer settings."
      ;;        shell-default-height 30
      ;;        shell-default-position 'bottom)
      ;; spell-checking
-     ;; syntax-checking
+     syntax-checking
      ;; version-control
     treemacs)
 
@@ -78,6 +86,8 @@ This function should only modify configuration layer settings."
                                       css-autoprefixer
                                       vue-mode
                                       vue-html-mode
+                                      flymake
+                                      flymake-eslint
                                       helm-tramp
                                       company-web
                                       tern
@@ -86,6 +96,9 @@ This function should only modify configuration layer settings."
                                       ac-php-core
                                       ac-cider
                                       eslint-fix
+                                      rsx-mode
+                                      yanippet-snippets
+                                      prettier-js
                                       tide)
 
    ;; A list of packages that cannot be updated.
@@ -102,6 +115,7 @@ This function should only modify configuration layer settings."
    ;; installs *all* packages supported by Spacemacs and never uninstalls them.
    ;; (default is `used-only')
    dotspacemacs-install-packages 'used-only))
+
 
 (defun dotspacemacs/init ()
   "Initialization:
@@ -524,7 +538,31 @@ This function is called at the very end of Spacemacs startup, after layer
 configuration.
 Put your configuration code here, except for variables that should be set
 before packages are loaded."
-  )
+  (defun tide-setup-hook ()
+    (tide-setup)
+    (eldoc-mode)
+    (tide-hl-identifier-mode +1)
+    (setq web-mode-enable-auto-quoting nil)
+    (setq web-mode-markup-indent-offset 2)
+    (setq web-mode-code-indent-offset 2)
+    (setq web-mode-attr-indent-offset 2)
+    (setq web-mode-attr-value-indent-offset 2)
+    (setq lsp-eslint-server-command '("node" (concat (getenv "HOME") "/var/src/vscode-eslint/server/out/eslintServer.js") "--stdio"))
+    (set (make-local-variable 'company-backends)
+         '((company-tide company-files :with company-yasnippet)
+           (company-dabbrev-code company-dabbrev))))
+
+  ;; yasnippet
+  (yas-global-mode 1)
+
+  ;; flycheck
+  (global-flycheck-mode)
+  (add-hook 'after-init-hook #'global-flycheck-mode)
+
+  ;; company-mode
+  (global-company-mode)
+
+)
 
 ;; Do not write anything past this comment. This is where Emacs will
 ;; auto-generate custom variable definitions.
@@ -538,8 +576,9 @@ This function is called at the very end of Spacemacs initialization."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(evil-want-Y-yank-to-eol nil)
  '(package-selected-packages
-   '(yaml-mode csv-mode sqlup-mode sql-indent tss yapfify stickyfunc-enhance sphinx-doc pytest pyenv-mode py-isort pippel pipenv pyvenv pip-requirements lsp-python-ms lsp-pyright live-py-mode importmagic epc ctable concurrent deferred helm-pydoc helm-cscope cython-mode company-anaconda blacken anaconda-mode pythonic vmd-mode markdown-toc gh-md emoji-cheat-sheet-plus company-emoji xah-css-mode css-autoprefixer vue-mode vue-html-mode tramp helm-tramp ac-cider tern-auto-complete ac-html ac-js2 yasnippet-snippets helm-company helm-c-yasnippet fuzzy auto-yasnippet ac-ispell auto-complete phpunit phpcbf php-extras php-auto-yasnippets helm-gtags ggtags geben drupal-mode dap-mode posframe lsp-treemacs bui lsp-mode markdown-mode dash-functional counsel-gtags company-phpactor phpactor composer php-runtime company-php ac-php-core xcscope php-mode tide typescript-mode tern rjsx-mode js2-mode js-doc import-js grizzl yasnippet web-mode web-beautify tagedit slim-mode scss-mode sass-mode pug-mode prettier-js impatient-mode htmlize simple-httpd helm-css-scss haml-mode emmet-mode counsel-css counsel swiper ivy company-web web-completion-data company add-node-modules-path ws-butler writeroom-mode winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package undo-tree treemacs-projectile treemacs-persp treemacs-icons-dired treemacs-evil toc-org symon symbol-overlay string-inflection spaceline-all-the-icons restart-emacs request rainbow-delimiters popwin pcre2el password-generator paradox overseer org-superstar open-junk-file nameless move-text macrostep lorem-ipsum link-hint indent-guide hybrid-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation helm-xref helm-themes helm-swoop helm-purpose helm-projectile helm-org helm-mode-manager helm-make helm-ls-git helm-flx helm-descbinds helm-ag google-translate golden-ratio font-lock+ flycheck-package flycheck-elsa flx-ido fancy-battery eyebrowse expand-region evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-line evil-surround evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-goggles evil-exchange evil-escape evil-ediff evil-cleverparens evil-args evil-anzu eval-sexp-fu emr elisp-slime-nav editorconfig dumb-jump dotenv-mode diminish devdocs define-word column-enforce-mode clean-aindent-mode centered-cursor-mode auto-highlight-symbol auto-compile aggressive-indent ace-link ace-jump-helm-line)))
+   '(flycheck-pos-tip pos-tip flymake flymake-eslint yaml-mode csv-mode sqlup-mode sql-indent tss yapfify stickyfunc-enhance sphinx-doc pytest pyenv-mode py-isort pippel pipenv pyvenv pip-requirements lsp-python-ms lsp-pyright live-py-mode importmagic epc ctable concurrent deferred helm-pydoc helm-cscope cython-mode company-anaconda blacken anaconda-mode pythonic vmd-mode markdown-toc gh-md emoji-cheat-sheet-plus company-emoji xah-css-mode css-autoprefixer vue-mode vue-html-mode tramp helm-tramp ac-cider tern-auto-complete ac-html ac-js2 yasnippet-snippets helm-company helm-c-yasnippet fuzzy auto-yasnippet ac-ispell auto-complete phpunit phpcbf php-extras php-auto-yasnippets helm-gtags ggtags geben drupal-mode dap-mode posframe lsp-treemacs bui lsp-mode markdown-mode dash-functional counsel-gtags company-phpactor phpactor composer php-runtime company-php ac-php-core xcscope php-mode tide typescript-mode tern rjsx-mode js2-mode js-doc import-js grizzl yasnippet web-mode web-beautify tagedit slim-mode scss-mode sass-mode pug-mode prettier-js impatient-mode htmlize simple-httpd helm-css-scss haml-mode emmet-mode counsel-css counsel swiper ivy company-web web-completion-data company add-node-modules-path ws-butler writeroom-mode winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package undo-tree treemacs-projectile treemacs-persp treemacs-icons-dired treemacs-evil toc-org symon symbol-overlay string-inflection spaceline-all-the-icons restart-emacs request rainbow-delimiters popwin pcre2el password-generator paradox overseer org-superstar open-junk-file nameless move-text macrostep lorem-ipsum link-hint indent-guide hybrid-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation helm-xref helm-themes helm-swoop helm-purpose helm-projectile helm-org helm-mode-manager helm-make helm-ls-git helm-flx helm-descbinds helm-ag google-translate golden-ratio font-lock+ flycheck-package flycheck-elsa flx-ido fancy-battery eyebrowse expand-region evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-line evil-surround evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-goggles evil-exchange evil-escape evil-ediff evil-cleverparens evil-args evil-anzu eval-sexp-fu emr elisp-slime-nav editorconfig dumb-jump dotenv-mode diminish devdocs define-word column-enforce-mode clean-aindent-mode centered-cursor-mode auto-highlight-symbol auto-compile aggressive-indent ace-link ace-jump-helm-line)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

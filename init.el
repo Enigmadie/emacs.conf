@@ -70,14 +70,14 @@
     (global-set-key "\C-xh" 'help-command)  (setq indent-line-function 'insert-tab)
 
     ;; JS
-    (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.jsx\\'" . rjsx-mode))
-    (add-to-list 'auto-mode-alist '("\\.js\\'" . javascript-mode))
-    (add-to-list 'auto-mode-alist '("\\.vue\\'" . vue-mode))
-    (add-hook 'typescript-mode-hook 'auto-complete-mode)
-    (add-hook 'javascript-mode-hook 'auto-complete-mode)
-    (add-hook 'rjsx-mode-hook 'auto-complete-mode)
-    (add-hook 'web-mode-hook 'auto-complete-mode)
+    ;; (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
+    ;; (add-to-list 'auto-mode-alist '("\\.jsx\\'" . rjsx-mode))
+    ;; (add-to-list 'auto-mode-alist '("\\.js\\'" . javascript-mode))
+    ;; (add-to-list 'auto-mode-alist '("\\.vue\\'" . vue-mode))
+    ;; (add-hook 'typescript-mode-hook 'auto-complete-mode)
+    ;; (add-hook 'javascript-mode-hook 'auto-complete-mode)
+    ;; (add-hook 'rjsx-mode-hook 'auto-complete-mode)
+    ;; (add-hook 'web-mode-hook 'auto-complete-mode)
     (setq create-lockfiles nil)
 
     ;; intent extensions for ts extension
@@ -85,6 +85,19 @@
     (setq-default js-indent-level 2)
     (add-hook 'web-mode-hook
       (lambda () (setq standard-indent 2)))
+
+    ;; add pckgs
+    (add-to-list 'load-path "~/emacs.conf/flycheck-typescript-tslint/")
+    (load-library "flycheck-typescript-tslint")
+    (eval-after-load 'flycheck
+      '(add-hook 'flycheck-mode-hook #'flycheck-typescript-tslint-setup))
+    (custom-set-variables
+    '(flycheck-typescript-tslint-config "~/emacs.conf/config/tslint.yml"))
+
+    ;; ;; eslint trying
+    (with-eval-after-load 'flycheck
+      (flycheck-add-mode 'javascript-eslint 'typescript-mode))
+
 
     ;; tern
     (eval-after-load 'tern
@@ -123,3 +136,20 @@
     (define-key rjsx-mode-map "<" nil)
     (define-key rjsx-mode-map (kbd "C-d") nil)
     (define-key rjsx-mode-map ">" nil))
+
+  ;; ts conf
+    (add-hook 'web-mode-hook 'tide-setup-hook
+              (lambda () (pcase (file-name-extension buffer-file-name)
+                          ("tsx" ('tide-setup-hook))
+                          (_ (my-web-mode-hook)))))
+    (flycheck-add-mode 'typescript-tslint 'web-mode)
+    (add-hook 'web-mode-hook 'company-mode)
+    (add-hook 'web-mode-hook 'prettier-js-mode)
+    (add-hook 'before-save-hook 'tide-format-before-save)
+
+
+    ;; use rjsx-mode for .js* files except json and use tide with rjsx
+    (add-to-list 'auto-mode-alist '("\\.js.*$" . rjsx-mode))
+    (add-to-list 'auto-mode-alist '("\\.json$" . json-mode))
+    (add-hook 'rjsx-mode-hook 'tide-setup-hook) (add-hook 'web-mode-hook #'turn-on-smartparens-mode t)
+
