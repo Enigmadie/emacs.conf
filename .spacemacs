@@ -96,8 +96,8 @@ This function should only modify configuration layer settings."
                                       ac-php-core
                                       ac-cider
                                       eslint-fix
-                                      rsx-mode
-                                      yanippet-snippets
+                                      ;; rsx-mode
+                                      ;; yanippet-snippets
                                       prettier-js
                                       tide)
 
@@ -539,28 +539,33 @@ configuration.
 Put your configuration code here, except for variables that should be set
 before packages are loaded."
   (defun tide-setup-hook ()
-    (tide-setup)
-    (eldoc-mode)
-    (tide-hl-identifier-mode +1)
-    (setq web-mode-enable-auto-quoting nil)
     (setq web-mode-markup-indent-offset 2)
     (setq web-mode-code-indent-offset 2)
     (setq web-mode-attr-indent-offset 2)
     (setq web-mode-attr-value-indent-offset 2)
-    (setq lsp-eslint-server-command '("node" (concat (getenv "HOME") "/var/src/vscode-eslint/server/out/eslintServer.js") "--stdio"))
-    (set (make-local-variable 'company-backends)
-         '((company-tide company-files :with company-yasnippet)
-           (company-dabbrev-code company-dabbrev))))
+  )
+  ;;   (tide-setup)
+  ;;   (eldoc-mode)
+  ;;   (tide-hl-identifier-mode +1)
+  ;;   (setq web-mode-enable-auto-quoting nil)
+  ;;   (setq web-mode-markup-indent-offset 2)
+  ;;   (setq web-mode-code-indent-offset 2)
+  ;;   (setq web-mode-attr-indent-offset 2)
+  ;;   (setq web-mode-attr-value-indent-offset 2)
+  ;;   (setq lsp-eslint-server-command '("node" (concat (getenv "HOME") "/var/src/vscode-eslint/server/out/eslintServer.js") "--stdio"))
+  ;;   (set (make-local-variable 'company-backends)
+  ;;        '((company-tide company-files :with company-yasnippet)
+  ;;          (company-dabbrev-code company-dabbrev))))
 
   ;; yasnippet
-  (yas-global-mode 1)
+  ;; (yas-global-mode 1)
 
   ;; flycheck
-  (global-flycheck-mode)
-  (add-hook 'after-init-hook #'global-flycheck-mode)
+  ;; (global-flycheck-mode)
+  ;; (add-hook 'after-init-hook #'global-flycheck-mode)
 
   ;; company-mode
-  (global-company-mode)
+  ;; (global-company-mode)
 
 )
 
@@ -586,3 +591,49 @@ This function is called at the very end of Spacemacs initialization."
  ;; If there is more than one, they won't work right.
  '(mmm-default-submode-face ((t (:background nil)))))
 )
+
+(defun my-setup-indent (n)
+  ;; java/c/c++
+  (setq-local c-basic-offset n)
+  ;; web development
+  (setq-local javascript-indent-level n) ; javascript-mode
+  (setq-local js-indent-level n) ; js-mode
+  (setq-local js2-basic-offset n) ; js2-mode, in latest js2-mode, it's alias of js-indent-level
+  (setq-local web-mode-markup-indent-offset n) ; web-mode, html tag in html file
+  (setq-local web-mode-css-indent-offset n) ; web-mode, css in html file
+  (setq-local web-mode-code-indent-offset n) ; web-mode, js code in html file
+  (setq-local css-indent-offset n) ; css-mode
+  )
+
+(defun my-office-code-style ()
+  (interactive)
+  (message "Office code style!")
+  ;; use tab instead of space
+  (setq-local indent-tabs-mode t)
+  ;; indent 4 spaces width
+  (my-setup-indent 4))
+
+(defun my-personal-code-style ()
+  (interactive)
+  (message "My personal code style!")
+  ;; use space instead of tab
+  (setq indent-tabs-mode nil)
+  ;; indent 2 spaces width
+  (my-setup-indent 2))
+
+(defun my-setup-develop-environment ()
+  (interactive)
+  (let ((proj-dir (file-name-directory (buffer-file-name))))
+    ;; if hobby project path contains string "hobby-proj1"
+    (if (string-match-p "hobby-proj1" proj-dir)
+        (my-personal-code-style))
+
+    ;; if commericial project path contains string "commerical-proj"
+    (if (string-match-p "commerical-proj" proj-dir)
+        (my-office-code-style))))
+
+;; prog-mode-hook requires emacs24+
+(add-hook 'prog-mode-hook 'my-setup-develop-environment)
+;; a few major-modes does NOT inherited from prog-mode
+(add-hook 'lua-mode-hook 'my-setup-develop-environment)
+(add-hook 'web-mode-hook 'my-setup-develop-environment)
